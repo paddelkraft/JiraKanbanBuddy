@@ -1,4 +1,7 @@
-ColorUtil = {
+
+//util.js
+
+var ColorUtil = {
     "getBackgroundColorCode":function(element){
         var colorCode = $(element).css("background-color");
         console.log("background-color = "+ colorCode);
@@ -31,3 +34,4 @@ ColorUtil = {
 
 };
 
+//util.js

@@ -1,9 +1,12 @@
+//board.js
 
 function boardEnhancer(){
 
     var textFilter;
     var wideBoard=false;
-
+    var boardheight=0;
+    var resize = 20;
+    var manipulatedByScript = false;
     var width = '';
     var customStyles = ".dil{padding: 3px; bottom: 3px;right: 3px;position: absolute; background-color:black;color:white;}"
         + ".hide{display:none;}"
@@ -33,14 +36,17 @@ function boardEnhancer(){
     function filterBoard(){
         var filter =textFilter();
 
+        localStorage.setItem("filter", filter);
+
         function filterElement(){
             var element = $(this);
             var content = element.text().toUpperCase() + cardAssignedTo(element);
 
             if (filter !== "" && content.indexOf(filter.toUpperCase()) === -1){
                 element.addClass(filterClass);
-            }else
+            }else{
                 element.removeClass(filterClass);
+            }
         }
 
         $.each($(".ghx-issue"),filterElement);
@@ -48,6 +54,7 @@ function boardEnhancer(){
     }
 
     function watermark(inputId,watermarkText) {
+
         $('#'+inputId).blur(function(){
             if ($(this).val().length === 0){
                 $(this).val(watermarkText).addClass('watermark');
@@ -57,7 +64,7 @@ function boardEnhancer(){
             if ($(this).val() === watermarkText){
                 $(this).val('').removeClass('watermark');
             }
-        }).val(watermarkText).addClass('watermark');
+        }).blur();
     }
 
 
@@ -71,6 +78,11 @@ function boardEnhancer(){
         textbox.type = 'text';
         textbox.setAttribute("id","filter-text");
         textbox.setAttribute("style","padding-left:10px;");
+        if(localStorage.getItem("filter")){
+            $(textbox).val(localStorage.getItem("filter"));
+        }
+        //textbox = $(textbox).wrap("<div class='dil'/>");
+
 
         if($('.subnav-container').length){
             $('.subnav-container').append(textbox);
@@ -78,8 +90,10 @@ function boardEnhancer(){
             $('#ghx-view-selector').append(textbox);
         }
 
-        $("#filter-text").change(filterBoard);
+        $("#filter-text").change(filterBoard)
+
         watermark("filter-text","Filter cards");
+
         textFilter = function(){
             var filter = "";
             if(!$(textbox).hasClass("watermark")){
@@ -87,6 +101,8 @@ function boardEnhancer(){
             }
             return filter;
         };
+
+        $("#filter-text").change();
     }
 
 
@@ -130,32 +146,54 @@ function boardEnhancer(){
         });
     }
 
+    function scrollHandling(){
+        $("#ghx-pool-column").scroll(function(){
+            $('div#ghx-column-header-group')
+                .css('top', $("#ghx-pool-column").scrollTop());
+        });
+    }
+
+    function announcementBanner(){
+        var banner = $($("#announcement-banner"));
+        banner.css("padding","0px");
+    }
+
 
     function adjustBoardWidth() {
         var colWidth = 200;
         var columns = $('ul.ghx-column-headers li').length;
-
+        var height;
         if (columns > 3) {
 
-            if($("#scrollwrap").length === 0){
-                $("#ghx-pool").wrapInner("<div id='scrollwrap' />")
+            height = $('div.ghx-work').css('height');
+
+            if(!manipulatedByScript && height!==boardheight){
+                height = height.replace("px","");
+                height = parseInt(height)- resize +"px";
+                $('div.ghx-work').css('height',height);
+                boardheight = height;
+                manipulatedByScript = true;
+                resize = 30;
+            }else{
+                manipulatedByScript = false;
+                boardheight = height;
             }
 
-            //$(".ghx-swimlane")
-            $("#scrollwrap")
-                .css('min-width', '' + colWidth * columns + 'px');
+
+            $("#ghx-pool")
+                .css('min-width', '' + colWidth * columns + 'px')
+                .css('overflow-y','visible');
 
             $("#ghx-pool-column")
                 .css('overflow-x', 'scroll')
-                .css('overflow-y', 'hide');
-
+                .css('overflow-y', 'scroll');
 
             width = $('ul.ghx-columns').css('width');
 
 
             $('div#ghx-column-header-group')
                 .css('min-width', width)
-                .css('top', $("#ghx-pool").scrollTop())
+                .css('top', $("#ghx-pool-column").scrollTop())
                 .css('left', '0px')
                 .css('position', 'relative');
 
@@ -175,10 +213,13 @@ function boardEnhancer(){
             setCardColors();
             addFilterTextbox();
             addGlobalStyle( customStyles);
-
+            scrollHandling();
+            announcementBanner();
         }
+
     }
 
     return enhance;
-
 }
+
+//board.js

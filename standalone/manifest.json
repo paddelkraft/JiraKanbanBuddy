@@ -1,6 +1,6 @@
 {
-    "name": "Jira kanban buddy (beta)",
-    "version": "0.0.6",
+    "name": "Jira standalone script",
+    "version": "0.0.7",
     "manifest_version": 2,
 
     "content_scripts": [
@@ -10,9 +10,9 @@
             "<all_urls>"
         ],
         "js": [
-          "content_scripts/jquery-2.1.1.min.js",
-          "content_scripts/require.js",
-          "content_scripts/boardWithRequire.js"
+          "lib/jquery-2.1.1.min.js",
+          "require.js",
+          "boardWithRequire.js"
         ]
       }
     ]
