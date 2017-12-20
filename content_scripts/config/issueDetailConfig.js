@@ -1,0 +1,65 @@
+export  default {
+    issuekey:{
+        fieldName:'key',
+        path:'key'
+    },
+    summary:{
+        fieldName:'summary',
+        path:'fields.summary'
+    },
+    issuetype:{
+        fieldName:'issuetype',
+        path:'fields.issuetype.name'
+    },
+    status: {
+        fieldName:'status',
+        path:'fields.status.name'
+    },
+    serviceArea:{
+        fieldName:'customfield_11306',
+        path:'fields.customfield_11306.0.value',
+
+    },
+    labels:{
+        fieldName:'labels',
+        path:'fields.labels',
+    },
+    epicLink:{
+        fieldName:'customfield_11200',
+        path:'fields.customfield_11200'
+    },
+    project:{
+        path:'fields.labels',
+        parser:{
+            type:"string",
+            match:"regex",
+            filter:'^[#*+_]'
+        }
+    },
+    program:{
+        path:'fields.labels',
+        parser:{
+            match:"in",
+            filter:'["$CnSS","$FaTS"]'
+        }
+    },
+    iteration:{
+        path:'fields.labels',
+        parser:{
+            match:"in",
+            filter:'["$PI2.1","$PI2.2","$PI2.3","$PI2.4","$PI2.5", "$PI2.6"]'
+        }
+    },
+    portfolio:{
+        field:"project",
+        parser:{
+            match:"category",
+            filter:[
+                {filter:"^#",name:"Start Cost"},
+                {filter:"^[*]",name:"PMR"},
+                {filter:"^[+]",name:"Internal"},
+                {filter:"^_",name:"R&D"}
+            ]
+        }
+    }
+};

@@ -1,6 +1,55 @@
 
 //util.js
 
+var __ = {
+  first:array=>array[0],
+  last:array=>array[array.length-1],
+  keys:object=>Object.keys(object),
+  debounce:  function (func, wait, immediate) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    },
+  isUndefined: (obj)=> typeof obj === 'undefined'
+};
+
+function OcurrenceCounter(){
+    let counterObject = {};
+    return {
+        add:function(text){
+            if(counterObject[text]){
+                counterObject[text]++;
+            } else{
+                counterObject[text]=1;
+            }
+        },
+        getData: function(){
+            let keys = (Object.keys(counterObject));
+            keys.sort()
+            let data = {}
+            keys.forEach((key)=>{
+               data[key]=counterObject[key];
+            });
+            return data;
+        }
+    }
+}
+
+function clearSelection(select){
+    select.options.forEach((option)=>{
+        option = null;
+    });
+}
+
 var ColorUtil = {
     "getBackgroundColorCode":function(element){
         var colorCode = $(element).css("background-color");
@@ -33,5 +82,7 @@ var ColorUtil = {
     }
 
 };
+
+export {ColorUtil,clearSelection,OcurrenceCounter,__}
 
 //util.js

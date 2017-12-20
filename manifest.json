@@ -1,19 +1,19 @@
 {
-    "name": "Jira kanban buddy (beta)",
-    "version": "0.0.7",
+    "name": "Jira board filter (beta)",
+    "version": "0.0.15",
     "manifest_version": 2,
-
     "content_scripts": [
       {
         "matches": [
-            "https://*/secure/RapidBoard.jspa*",
-            "<all_urls>"
+          "https://*/issues/*",
+          "http://*/issues/*",
+          "https://*/browse/*",
+          "http://*/browse/*",
+          "https://*/secure/RapidBoard.jspa*",
+          "http://*/secure/RapidBoard.jspa*"
         ],
         "js": [
-          "lib/jquery-2.1.1.min.js",
-          "content_scripts/util.js",
-          "content_scripts/board.js",
-          "content_scripts/trigger.js"
+          "dist/issues.js"
         ]
       }
     ]

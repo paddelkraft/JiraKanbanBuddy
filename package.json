@@ -1,0 +1,26 @@
+{
+  "name": "jira-board-filter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paddelkraft/JiraKanbanBuddy.git"
+  },
+  "author": "Magnus Siverbrant",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paddelkraft/JiraKanbanBuddy/issues"
+  },
+  "homepage": "https://github.com/paddelkraft/JiraKanbanBuddy#readme",
+  "devDependencies": {
+    "jest": "^21.2.1"
+  },
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "lodash": "^4.17.4"
+  }
+}
