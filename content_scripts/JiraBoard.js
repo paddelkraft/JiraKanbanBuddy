@@ -62,12 +62,12 @@ function superBoard(){
         .dropdown:hover .dropdown-content {
             display: block;
         }`;
-     function extContainerStyles(right){
+     function extContainerStyles(right,top = 2){
 
        right = right||300;
        return `.ext-container{
             position: absolute;
-            top:2px;
+            top:${top}px;
             left:${right}px;
             overflow:visible;
             z-index: 100;
@@ -107,17 +107,45 @@ function superBoard(){
 //+ ".pale {background-color: transparent; color: #ddd}" ;
     let highlight = false;
 
+    const elementRight = (element)=>{
+        if (element){
+            let box = element.getBoundingClientRect()
+            return box.x+box.width + 4;
+        }
+        return 0;
+    };
+
+
+    const elementTop = (element)=>{
+        if (element){
+            let box = element.getBoundingClientRect()
+            return box.y;
+        }
+        return 0;
+    };
+
+
+    const jiraCreateButtonRight = ()=> elementRight(document.getElementById("create_link"));
+
+    const jiraAssigneeListRight = () =>  elementRight($('[aria-controls=assigneeList]')[0]); //.boOJAH')[0]);
+    const jiraAssigneeListTop = () =>  elementTop( $('[aria-controls=assigneeList]')[0] );//$('.boOJAH')[0]);
+
     return {
 
         addCustomBoardStyles: function () {
-            let box = document.getElementById("create_link").getBoundingClientRect()
-            this.addGlobalStyle(customStyles+dropdownStyles+extContainerStyles(box.x+box.width + 4),"custom");
+            const createButtonRight = jiraCreateButtonRight();
+            let top = createButtonRight ? 2 : jiraAssigneeListTop();
+            this.addGlobalStyle(customStyles+dropdownStyles+extContainerStyles(createButtonRight||jiraAssigneeListRight(),top),"custom");
 
         },
         addIssueSearchCustomStyles: function (right) {
-            let box = document.getElementById("create_link").getBoundingClientRect()
-            this.addGlobalStyle(customStyles+dropdownStyles +extContainerStyles(right||box.x+box.width)+ issuesSearchStyles,"custom");
-
+            const createButtonRight = jiraCreateButtonRight();
+            const ancorElement = $('.save-as-new-filter,.issue-link[data-issue-key]')[0];
+            let top = createButtonRight ? 2 : elementTop(ancorElement);
+            let elemRight = createButtonRight||elementRight(ancorElement);
+            this.addGlobalStyle(customStyles+dropdownStyles+extContainerStyles(createButtonRight||elementRight(ancorElement),top),"custom");
+            $('.ext-container').css('top',top);
+            $('.ext-container').css('left',elemRight);
         },
 
         addGlobalStyle: function (css,id) {
@@ -207,8 +235,11 @@ function superBoard(){
                 $('.ext-container').append(element);
                 return;
             }
+
             if ($('.subnav-container').length) {
                 $('.subnav-container').append(element);
+            }else if ($('.saved-search-operations').length) {
+                $('.saved-search-operations').append(element);
             } else {
                 $('#ghx-view-selector').append(element);
             }
@@ -284,7 +315,7 @@ function superBoard(){
         },
         visibleEpics:function(){
             let epics = {};
-            let issues = $(".ghx-issue:has(.ghx-type[title=Epic]):visible , .ghx-issue-compact:has(.ghx-type[title=Epic]):visible");
+            let issues = $(".ghx-issue:has(.ghx-type[title=Epic]):visible , .ghx-issue-compact:has(.ghx-type[title=Epic]):visible, .ghx-issue:has(.ghx-field-icon[data-tooltip=Epic]):visible");
             issues.each(function (){
                 let issue = $(this);
                 let issueKey = issue.attr("data-issue-key");

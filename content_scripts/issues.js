@@ -39,16 +39,17 @@ function basicJiraFields(){
 
 
 function IssuekeyFilter(issues){
+    console.log(issues);
     let self = {
         "issues":issues,
         all: function (){
-            return self.issues.map(issue=> issue.key);
+            return self.issues.map(issue=> issue.key||issue.issuekey);
         },
         stories: function(){
-            return self.issues.filter(issue=> issue.issuetype==="story").map(issue=> issue.issuekey);
+            return self.issues.filter(issue=> (issue.issuetype||issue.type)==="story").map(issue=> issue.issuekey);
         },
         epics: function(){
-            return self.issues.filter(issue=> issue.issuetype==="Epic").map(issue=> issue.issuekey);
+            return self.issues.filter(issue=> (issue.issuetype||issue.type)==="Epic").map(issue=> issue.issuekey);
         },
         linkedEpics: function(){
             return _.uniq(self.issues.filter(issue=> issue.epicLink)
@@ -73,7 +74,7 @@ function allEpics(){
 
 function allStories(){
     const query = new JqlQuery("("+issuesPage.getQuery()+")").and().issuetype().in("Story").query;
-    issuesPage.runQuery();
+    issuesPage.runQuery(query);
 }
 
 function notEpics(){
@@ -150,19 +151,16 @@ function wrap(){
 }
 
 function closed(){
-    const query = new JqlQuery(issuesPage.getQuery()).and().status().in(["closed"]).query;
+    const query = new JqlQuery(issuesPage.getQuery()).and().resolved().not().in(["EMPTY"]).query;
    issuesPage.runQuery(query);
 }
 
 function notClosed(){
-    const query = new JqlQuery(issuesPage.getQuery()).and().status().not().in(["closed"]).query;
+    const query = new JqlQuery(issuesPage.getQuery()).and().resolved().in(["EMPTY"]).query;
    issuesPage.runQuery(query);
 }
 
-function andAppend(jql){
-    const query = new JqlQuery(issuesPage.getQuery()).wrap().and().appendChriteria(jql).query;
-   issuesPage.runQuery(query);
-}
+
 
 function pushQueryToFilter(filterName){
     let query = issuesPage.getQuery();
@@ -205,7 +203,7 @@ function dropdownMenu(){
         return;
     }
     let container=document.createElement('div');
-    container.setAttribute("id","search-for-epic-issues");
+    container.setAttribute("id","search-issues");
     container.setAttribute("class", "dropdown issues");
     container.setAttribute("style", "font-size:small;padding:3px;")
 
@@ -229,8 +227,8 @@ function dropdownMenu(){
             <hr>
             <a id="order-by-rank">Order by rank</a><br>
             <a id="wrap">Wrap</a><br>
-            <a id="closed">Closed</a><br>
-            <a id="not-closed">!Closed</a><br>
+            <a id="closed">Done</a><br>
+            <a id="not-closed">!Done</a><br>
             <hr>
             <a id="csv">Export result as custom csv </a><br>
           </div>

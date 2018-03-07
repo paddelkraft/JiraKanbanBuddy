@@ -13,11 +13,11 @@ export default function () {
         background-color:black !important;
     }
     
-    a[title^='$CnSS'],a[title^='$FaTS']{
+    a[title^=\\$CS],a[title^=\\$FaTS],a[title^='$SuS'],a[title^='$IF']{
          color:white;
         background-color:MediumPurple !important;
     }
-    a[title^=\\$PI2]{
+    a[title^=\\$PI3]{
         background-color:palegreen !important;
     }
     
@@ -25,8 +25,13 @@ export default function () {
         color:white;
         background-color:red !important;
     }
+    a[title=PI2Crit]{
+        color:white;
+        background-color:red !important;
+    }
     
-    a[title=CS]{
+    
+    a[title=PI2Crit],a[title=spillover],a[title=Feature]{
         color:gray;
         background-color:lightGray !important;
     }

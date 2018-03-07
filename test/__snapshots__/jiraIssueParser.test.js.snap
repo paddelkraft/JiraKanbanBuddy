@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`get list of jira fields 1`] = `
+Array [
+  "key",
+  "summary",
+  "issuetype",
+  "status",
+  "customfield_11306",
+  "labels",
+  "customfield_11200",
+]
+`;
+
+exports[`parse issue detail api response 1`] = `
+Object {
+  "epicLink": "",
+  "issuekey": "TECH-42881",
+  "issuetype": "Epic",
+  "iteration": ".SRP1.4",
+  "labels": Array [
+    "#P2583-WP4",
+    ".SRP1",
+    ".SRP1.4",
+    "CS",
+    "Top10",
+  ],
+  "portfolio": "Start Cost",
+  "project": "#P2583-WP4",
+  "serviceArea": "NextGen - Team Fjontend",
+  "status": "DEVELOP",
+  "summary": "Vehicle Status - Vehicle Page - See More Tell Tale details",
+}
+`;

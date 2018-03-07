@@ -1,6 +1,6 @@
 {
     "name": "Jira board filter (beta)",
-    "version": "0.0.15",
+    "version": "0.0.18",
     "manifest_version": 2,
     "content_scripts": [
       {
@@ -11,6 +11,10 @@
           "http://*/browse/*",
           "https://*/secure/RapidBoard.jspa*",
           "http://*/secure/RapidBoard.jspa*"
+        ],
+        "exclude_matches":[
+          "http://*/secure/RapidBoard.jspa?*view=reporting*",
+          "https://*/secure/RapidBoard.jspa?*view=reporting*"
         ],
         "js": [
           "dist/issues.js"

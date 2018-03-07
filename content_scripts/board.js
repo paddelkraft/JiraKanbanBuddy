@@ -1,77 +1,61 @@
 console.log("board.js");
+"use strict";
 
 import $ from 'jquery';
 import JiraBoard from './JiraBoard'
 import {ColorUtil,clearSelection,OcurrenceCounter,__} from './util';
 import issuetypeConfig from './config/issuetypeConfig';
+import boardFilter from '../util/boardFilter';
+import FreetextFilter from './freetextFilter';
 
 function boardEnhancer(){
 
     let width = '';
     let jiraBoard = new JiraBoard();
     let filterClass = "hide";
-    let filter = "";
-    let filterElement;
+    const freetextFilter = FreetextFilter(filterIssues);
 
-    function saveFreeTextFilter(text){
-        localStorage.setItem("filter", text);
-    }
 
-    function freetextFilterTextbox() {
-        let textbox ;
+    function filterIssues(){
 
-        function watermark(inputId,watermarkText) {
 
-            $('#'+inputId).blur(function(){
-                if ($(this).val().length === 0){
-                    $(this).val(watermarkText).addClass('watermark');
+        function filterElement(){
+
+            function cardAssignedTo(element){
+                let avatar = element.find(".ghx-avatar-img")[0];
+                if(avatar){
+                    return $(avatar).attr("data-tooltip").toUpperCase();
                 }
+                return "";
+            }
 
-            }).focus(function(){
-                if ($(this).val() === watermarkText){
-                    $(this).val('').removeClass('watermark');
-                }
-            }).blur();
-        }
+            function getCurrentFilterValues(){
+                return [$("#filter-select").val().toUpperCase()||"", freetextFilter.getTextFilterValue().toUpperCase() ];
+            }
 
-        function filterBoard(textFilter){
-            return function(){
-                saveFreeTextFilter(textFilter());
-                $.each($(".js-issue"),filterElement);
-                $.each($(".ghx-parent-stub"),filterElement);
+
+            const element = $(this);
+            const content = element.text().toUpperCase() +" "+ cardAssignedTo(element);
+            let show = boardFilter(getCurrentFilterValues()).filterBoardIssue(content);
+
+            if(!show){
+                element.addClass(filterClass);
+            }else{
+                element.removeClass(filterClass);
             }
         }
 
-
-
-        if($("#filter-text").length){
-            return;
-        }
-        textbox = document.createElement('input');
-        textbox.type = 'text';
-        textbox.setAttribute("id","filter-text");
-        textbox.setAttribute("style","padding-left:10px;");
-        if(localStorage.getItem("filter")){
-            $(textbox).val(localStorage.getItem("filter"));
-        }
-
-
-        $(textbox).keyup(__.debounce(filterBoard(getTextFilterValue),250));
-
-        watermark("filter-text","Find");
-        $("#filter-text").change();
-        return textbox;
+        $.each($(".js-issue"),filterElement);
+        $.each($(".ghx-parent-stub"),filterElement);
     }
 
-    let getTextFilterValue = function(){
-        let filterString = "";
-        let textbox = $("#filter-text");
-        if(!textbox.hasClass("watermark")){
-            filterString = textbox.val();
-        }
-        return filterString;
-    };
 
+
+    function clearFilters(){
+        freetextFilter.clearFilter();
+        $("#filter-select").val("");
+        filterIssues();
+    }
 
 
 
@@ -142,37 +126,19 @@ function boardEnhancer(){
         return extraFields;
     }
 
-    function groupByAttribute(query,attribute){
-        const groups = {};
-        $(query).each(function(){
-            const element = $(this);
-            if(! element.closest(".ghx-done").length ) {
-                groups[$(this).attr(attribute)]="";
-            }
-        });
-        return groups;
-
-    }
-
-
 
      function findFilters(){
         const filters = countIssuesPerExtraFieldTooltip();
         const standardFilters = [];
-         //standardFilters.push(["Assignee", groupByAttribute(".ghx-avatar-img","data-tooltip")]);
-        //standardFilters.push(["Card type", groupByAttribute(".ghx-type","title"),".ghx-type"]);
         standardFilters.push([issuetypeConfig.epic, countOpenIssuesPerEpicLinkTitle(),"span[data-epickey]"]);
-
-
 
         standardFilters.forEach(filter=>{
             if(Object.keys(filter[1]).length){
-
-             filters[filter[0]] = {
-                 queryString: filter[2],
-                 values: filter[1]
-             }
-         }
+                filters[filter[0]] = {
+                    queryString: filter[2],
+                    values: filter[1]
+                }
+            }
         });
 
 
@@ -192,9 +158,8 @@ function boardEnhancer(){
             Object.keys(filters.values).sort().forEach(filter => {
                 html += "<option value='" + filter + "'>" + filter + " ,"+ filters.values[filter]+ "</option>";
             });
-            //select.setAttribute("style","position: absolute;bottom: 0;right: 0;opacity:0.5");
             filterSelect.innerHTML = html;
-            filterElement = filterElementBy(filters.queryString);
+            //filterElement = filterElementBy(filters.queryString);
             filterIssues();
         }
 
@@ -235,7 +200,7 @@ function boardEnhancer(){
         filterSelect.setAttribute("id","filter-select");
         filterSelect.setAttribute("style","width:30%;max-width:150px;");
         jiraBoard.appendCustomElement(filterSelect);
-        jiraBoard.appendCustomElement(freetextFilterTextbox());
+        jiraBoard.appendCustomElement(freetextFilter.freetextFilterTextbox());
 
 
 
@@ -250,57 +215,6 @@ function boardEnhancer(){
     }
 
 
-
-    function filterIssues(){
-        filter = $("#filter-select").val()||"";
-        localStorage.setItem("categoryFilter",filter);
-        filter = (typeof filter !== 'undefined')? filter : "";
-        $.each($(".js-issue"),filterElement);
-        $.each($(".ghx-parent-stub"),filterElement);
-    }
-
-    function filterElementBy(queryString){
-
-        function cardAssignedTo(element){
-            let avatar = element.find(".ghx-avatar-img")[0];
-            if(avatar){
-                return $(avatar).attr("data-tooltip").toUpperCase();
-            }
-            return "";
-        }
-
-        return function filterElement(){
-            const element = $(this);
-            const content = element.text().toUpperCase() +" "+ cardAssignedTo(element);
-            const freetextFilter = getTextFilterValue().toUpperCase();
-            let show = true;
-            let match;
-            if(queryString){
-                match = element.find(queryString)[0];
-            }
-
-            if((filter==="{$$}" & typeof match !== 'undefined')
-                ||(((filter !== "" & filter !== "{$$}") && content.indexOf(filter.toUpperCase()) === -1))){
-                show = false;
-            }
-            if(show && ( freetextFilter !== ""  && content.indexOf(freetextFilter) === -1)){
-                show = false;
-            }
-
-            if(!show){
-                element.addClass(filterClass);
-            }else{
-                element.removeClass(filterClass);
-            }
-        }
-    }
-
-    function clearFilters(){
-        $("#filter-text").val("");
-        $("#filter-select").val("");
-        saveFreeTextFilter("");
-        filterIssues();
-    }
 
     function addFilters(){
 
@@ -387,7 +301,7 @@ function boardEnhancer(){
             jiraBoard.highlightByExtraField();
             document.onkeypress = function (e) {
                 e = e || window.event;
-                if(e.code === "KeyX"){
+                if(e.code === "KeyX" && document.activeElement !== freetextFilter.getFreetextFilterTextboxElement()){
                     clearFilters();
                 }
 

@@ -40,14 +40,14 @@ export  default {
         path:'fields.labels',
         parser:{
             match:"in",
-            filter:'["$CnSS","$FaTS"]'
+            filter:'["$CnSS","$FaTS","$SuS"]'
         }
     },
     iteration:{
         path:'fields.labels',
         parser:{
             match:"in",
-            filter:'["$PI2.1","$PI2.2","$PI2.3","$PI2.4","$PI2.5", "$PI2.6"]'
+            filter:'["$PI3.1","$PI3.2","$PI3.3","$PI3.4","$PI3.5", "$PI3.6"]'
         }
     },
     portfolio:{
